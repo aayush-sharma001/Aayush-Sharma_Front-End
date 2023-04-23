@@ -1,0 +1,25 @@
+Que1. Explain what the simple List component does.
+
+Ans: The simple list is a reusable functional component that displays a list of items.
+
+It contains two components: 
+1.SingleListItem 
+2.WrappedListComponent
+
+-> SingleListItem is taking in four props:
+1. index
+2. isSelected
+3. onClickHandler
+4. text
+
+Each item of list is displayed by singleListItem, which displays the items text and changes its background color, 
+when it is selected it changes it to green else it is red. SingleListItem is wrapped using memo to prevent unnecessary 
+re-renders.
+
+
+-> WrappedListComponent: 
+1. It is a functional component which is taking an array of object as props.
+2. Using map function sending the props to SingleListItem. 
+3. It has a function called handleClick that takes the index as input of the selected item. This allows the selected item to be highlighted. 
+4. It is also wrapped in a memo to prevent unnecessary re-renders.
+

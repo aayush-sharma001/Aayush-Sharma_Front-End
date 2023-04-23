@@ -1,0 +1,122 @@
+import React, { useState, useEffect, memo } from 'react';
+import PropTypes from 'prop-types';
+
+// Single List Item
+const WrappedSingleListItem = ({
+  index,
+  isSelected,
+  onClickHandler,
+  text,
+}) => {
+  return (
+    <li
+      style={{ backgroundColor: isSelected ? 'green' : 'red'}}
+      onClick={onClickHandler(index)}
+    >
+      {text}
+    </li>
+  );
+};
+
+WrappedSingleListItem.propTypes = {
+  index: PropTypes.number,
+  isSelected: PropTypes.bool,
+  onClickHandler: PropTypes.func.isRequired,
+  text: PropTypes.string.isRequired,
+};
+
+const SingleListItem = memo(WrappedSingleListItem);
+
+// List Component
+const WrappedListComponent = ({
+  items,
+}) => {
+  const [setSelectedIndex, selectedIndex] = useState();    //const [selectedState, setSelectedState]=useState(null);
+
+  useEffect(() => {
+    setSelectedIndex(null);
+  }, [items]);
+
+  const handleClick = index => {
+    setSelectedIndex(index);
+  };
+
+  return (
+    <ul style={{ textAlign: 'left' }}>
+      {items.map((item, index) => (
+        <SingleListItem
+          onClickHandler={() => handleClick(index)}
+          text={item.text}
+          index={index}
+          isSelected={selectedIndex}
+        />
+      ))}
+    </ul>
+  )
+};
+
+WrappedListComponent.propTypes = {
+  items: PropTypes.array(PropTypes.shapeOf({
+    text: PropTypes.string.isRequired,
+  })),
+};
+
+WrappedListComponent.defaultProps = {
+  items: null,
+};
+
+const List = memo(WrappedListComponent);
+
+export default List;
+
+
+
+
+Ans: The possible errors, warnings in the given code could be:
+
+1. In WrappedListComponent, useState hook is called incorrectly aslo a null value should be passed to useState() so that it does initialised by 
+null at the place of undefined:
+
+Line no. 34 ->                       const [setSelectedIndex, selectedIndex] = useState();
+=> Correct code should be ->         const[selectedIndex, setSelectedIndex] = useState(null);
+
+
+2. In the SingleListItem component, the onClickHandler prop is being passed a function call instead of a function reference.
+to avoid invoking the function immediately on render we need to correct the code using arrow function.
+
+Line no. 14 ->                         onClick={onClickHandler(index)}
+=>Correct code should be ->            onClick={() => onClickHandler(index)}
+
+
+3. In the WrappedListComponent propTypes, the items propType is defined incorrectly.
+
+Line no. 59 ->                         items: PropTypes.array(PropTypes.shapeOf({text: PropTypes.string.isRequired,}))
+=>Correct code should be ->            items: PropTypes.arrayOf(PropTypes.shape({text: PropTypes.string.isRequired,}))   
+
+4. Before writing a map to items we need to do a null check.
+
+Line no. 46->                           {items.map((item, index)            
+=>Correct code should be ->             {items && items.map((item, index) 
+
+5. When we are using map we need to give a key with a value so that every item in the list are uniquely identified by 
+it. also the isSelected type should be number not boolean.
+
+Line no. 47->                           <SingleListItem
+                                        onClickHandler={() => handleClick(index)}
+                                        text={item.text}
+                                        index={index}
+                                        isSelected={selectedIndex}
+                                        /> 
+
+=>Correct code should be ->             <SingleListItem
+                                        key={index}                           //added line
+                                        onClickHandler={() => handleClick(index)}
+                                        text={item.text}
+                                        index={index}
+                                        isSelected={selectedIndex===index}    //changed line
+                                        />   
+
+
+
+6. Also we can do a modification that, the SingleListItem component should be declared inside the WrappedListComponent component to 
+avoid polluting the global namespace with a component that is only used in one place.
